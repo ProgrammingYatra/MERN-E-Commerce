@@ -10,6 +10,10 @@ module.exports = (err, req, res, next) => {
     err = new ErrorHandler(message, 400);
   }
 
+  //validation Error
+  if (err.name == "ValidationError") {
+    err = new ErrorHandler(err.message, 400);
+  }
   // Mongoose duplicate key error
   if (err.code === 11000) {
     const message = `Duplicate ${Object.keys(err.keyValue)} Entered`;

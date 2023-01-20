@@ -1,59 +1,29 @@
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncError = require("./catchAsyncError");
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
-const validation = require("../validation/validator");
+const userModel = require("../models/userModel");
 
-exports.authentication = (req, res, next) => {
-  try {
-    let bearerHeader = req.headers.authorization;
-    if (typeof bearerHeader == "undefined")
-      return res
-        .status(400)
-        .send({ status: false, message: "Token is missing" });
-
-    let bearerToken = bearerHeader.split(" ");
-    let token = bearerToken[1];
-    jwt.verify(token, "Products-Management", function (err, data) {
-      if (err) {
-        return res.status(400).send({ status: false, message: err.message });
-      } else {
-        req.decodedToken = data;
-        next();
-      }
-    });
-  } catch (err) {
-    res.status(500).send({ status: false, error: err.message });
+exports.isAuthenticate = catchAsyncError(async (req, res, next) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return next(new ErrorHandler("Please Login to Access data", 401));
   }
-};
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = await userModel.findById(decodedToken.id);
+  next();
+});
 
-exports.authorization = async (req, res, next) => {
-  try {
-    let loggedInUser = req.decodedToken.userId;
-    let loginUser;
-
-    if (req.params?.userId) {
-      if (!validation.isValidObjectId(req.params.userId))
-        return res
-          .status(400)
-          .send({ status: false, message: "Enter a valid user Id" });
-      let checkUserId = await User.findById(req.params.userId);
-      if (!checkUserId)
-        return res
-          .status(404)
-          .send({ status: false, message: "User not found" });
-      loginUser = checkUserId._id.toString();
+exports.authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `Role: ${req.user.role} is not allowed to access this resouce `,
+          403
+        )
+      );
     }
 
-    if (!loginUser)
-      return res
-        .status(400)
-        .send({ status: false, message: "User-id is required" });
-
-    if (loggedInUser !== loginUser)
-      return res
-        .status(403)
-        .send({ status: false, message: "Error!! authorization failed" });
     next();
-  } catch (err) {
-    res.status(500).send({ status: false, error: err.message });
-  }
+  };
 };
