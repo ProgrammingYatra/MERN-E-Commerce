@@ -1,6 +1,7 @@
 import "./App.css";
+import ProductDetails from "./component/Product/ProductDetails";
 import { useEffect } from "react";
-import { BrowserRouter , Route , Routes } from 'react-router-dom'
+import { BrowserRouter as Router , Route , Routes } from 'react-router-dom'
 import WebFont from "webfontloader";
 import Header from "./component/layout/Header/Header.js";
 import Footer from "./component/layout/Footer/Footer";
@@ -15,14 +16,14 @@ function App() {
   });
   return (
     <>
-      <BrowserRouter>
+      <Router>
       <Header/>
       <Routes>
         <Route path='/' element={<Home/>}/>
-        
+        <Route path='/product/:id' element={<ProductDetails/>}/>
       </Routes>
       <Footer/>
-      </BrowserRouter>
+      </Router>
     </>
   );
 }
