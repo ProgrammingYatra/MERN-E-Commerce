@@ -11,13 +11,11 @@ import ReviewCard from "./ReviewCard.js";
 import Loader from "../layout/Loader/Loader";
 import MetaData from "../layout/MetaData";
 import { addItemsToCart } from "../../actions/cartAction";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-} from "@mui/material";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import DialogContent from '@mui/material/DialogContent';
 import Rating from '@mui/material/Rating';
 import { NEW_REVIEW_RESET } from "../../constants/productConstants";
 
@@ -95,7 +93,7 @@ const ProductDetails = ({ match }) => {
       dispatch({ type: NEW_REVIEW_RESET });
     }
     dispatch(getProductDetails(match.params.id));
-  }, [dispatch, match.params.id, error, alert, reviewError, success]);
+  }, [dispatch, match.params.id, error,  reviewError, success]);
 
   return (
     <Fragment>

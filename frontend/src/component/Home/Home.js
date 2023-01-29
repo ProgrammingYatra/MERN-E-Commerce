@@ -6,14 +6,19 @@ import MetaData from "../layout/MetaData";
 import { getProduct } from "../../actions/productAction";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "../layout/Loader/Loader";
-
+import { toast } from 'react-toastify';
 const Home = () => {
   const dispatch = useDispatch();
-  const { loading, products } = useSelector((state) => state.products);
-
+  const { loading, error,products } = useSelector((state) => state.products);
+console.log(products)
   useEffect(() => {
+    if(error){
+      return toast.error(error, {
+        position: toast.POSITION.TOP_RIGHT
+    });
+    }
     dispatch(getProduct());
-  }, [dispatch]);
+  }, [dispatch,error]);
 
   return (
     <Fragment>
